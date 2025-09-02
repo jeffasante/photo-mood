@@ -54,7 +54,5 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Build Docker images
-      run: |
-        docker-compose build
-        echo "All services built successfully"
+    - name: Build with Docker Compose
+      run: docker compose build
