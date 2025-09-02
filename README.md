@@ -51,7 +51,7 @@ The application consists of three independent microservices:
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/jeffasante/photo-mood
 cd photo-mood
 ```
 
