@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+python-multipart
+torch
+transformers
+Pillow
+redis[hiredis]

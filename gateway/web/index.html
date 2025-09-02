@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Mood</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            color: #666666;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            padding: 60px 0 80px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 4rem;
+            font-weight: 300;
+            letter-spacing: -2px;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: #666666;
+            font-weight: 300;
+            margin-bottom: 40px;
+        }
+
+        .description {
+            max-width: 500px;
+            margin: 0 auto;
+            color: #888888;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-bottom: 100px;
+        }
+
+        .upload-section {
+            background: #fafafa;
+            border-radius: 16px;
+            padding: 60px 40px;
+            margin-bottom: 40px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .drop-area {
+            border: 2px dashed #dddddd;
+            border-radius: 12px;
+            padding: 80px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #ffffff;
+        }
+
+        .drop-area:hover,
+        .drop-area.highlight {
+            border-color: #888888;
+            background: #f8f8f8;
+        }
+
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 24px;
+            opacity: 0.6;
+            stroke: #666666;
+        }
+
+        .drop-text {
+            font-size: 1.1rem;
+            color: #666666;
+            font-weight: 300;
+            margin-bottom: 8px;
+        }
+
+        .browse-link {
+            color: #444444;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .file-types {
+            color: #aaaaaa;
+            font-size: 0.85rem;
+            margin-top: 16px;
+            font-weight: 300;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 2px solid #f0f0f0;
+            border-top: 2px solid #888888;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 24px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-text {
+            color: #666666;
+            font-size: 0.95rem;
+            font-weight: 300;
+        }
+
+        /* Results */
+        .results {
+            display: none;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+
+        .result-card {
+            background: #fafafa;
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .result-title {
+            font-size: 0.85rem;
+            color: #888888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .thumbnail {
+            width: 100%;
+            max-width: 200px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: #f0f0f0;
+            color: #555555;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 400;
+            border: 1px solid #e0e0e0;
+        }
+
+        .caption-card {
+            grid-column: 1 / -1;
+        }
+
+        .caption {
+            color: #555555;
+            font-size: 1rem;
+            line-height: 1.7;
+            font-weight: 300;
+            font-style: italic;
+        }
+
+        .reset-btn {
+            background: #555555;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: 0.5px;
+            margin: 0 auto;
+            display: block;
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .reset-btn:hover {
+            background: #333333;
+            transform: translateY(-1px);
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 0 40px;
+            text-align: center;
+            border-top: 1px solid #f0f0f0;
+            margin-top: 80px;
+        }
+
+        .footer-info {
+            color: #aaaaaa;
+            font-size: 0.85rem;
+            font-weight: 300;
+            margin-bottom: 8px;
+        }
+
+        .footer-link {
+            color: #666666;
+            text-decoration: none;
+            font-weight: 400;
+        }
+
+        .footer-link:hover {
+            color: #333333;
+            text-decoration: underline;
+        }
+
+        .footer-tech {
+            color: #bbbbbb;
+            font-size: 0.8rem;
+            font-weight: 300;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px;
+            }
+
+            .logo {
+                font-size: 3rem;
+            }
+
+            header {
+                padding: 40px 0 60px;
+            }
+
+            .upload-section {
+                padding: 40px 24px;
+            }
+
+            .drop-area {
+                padding: 60px 24px;
+            }
+
+            .result-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .result-card {
+                padding: 24px;
+            }
+        }
+
+        /* Subtle animations */
+        .result-card {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.6s ease forwards;
+        }
+
+        .result-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .result-card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="logo">photo mood</h1>
+            <p class="tagline">AI-Powered Image Analysis</p>
+            <p class="description">
+                Upload an image to discover its emotional essence through advanced computer vision. 
+                Our AI analyzes visual elements to extract mood, generate thumbnails, and provide insights.
+            </p>
+        </header>
+
+        <main class="main-content">
+            <section class="upload-section">
+                <div id="drop-area" class="drop-area">
+                    <svg class="upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                    </svg>
+                    <p class="drop-text">Drop your image here or <span class="browse-link">browse files</span></p>
+                    <p class="file-types">Supports JPG, PNG, GIF up to 10MB</p>
+                </div>
+                <input type="file" id="file-input" accept="image/*">
+            </section>
+
+            <div id="loader" class="loader">
+                <div class="spinner"></div>
+                <p class="loader-text">Analyzing image on CPU, this may take a few seconds...</p>
+            </div>
+
+            <div id="results" class="results">
+                <div class="result-grid">
+                    <div class="result-card">
+                        <h3 class="result-title">Thumbnail</h3>
+                        <img id="thumbnail" alt="Generated Thumbnail" class="thumbnail">
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3 class="result-title">Mood Tags</h3>
+                        <div id="tags-container" class="tags-container"></div>
+                    </div>
+
+                    <div class="result-card caption-card">
+                        <h3 class="result-title">AI Analysis</h3>
+                        <p id="caption" class="caption"></p>
+                    </div>
+                </div>
+
+                <button id="reset-btn" class="reset-btn">Analyze Another Image</button>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-info">
+                built by <a href="https://jeffasante.github.io/" class="footer-link" target="_blank" rel="noopener">jeff</a>
+            </div>
+            <div class="footer-tech">
+                Powered by microservices architecture
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // DOM elements
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('file-input');
+        const loader = document.getElementById('loader');
+        const resultsDiv = document.getElementById('results');
+        const thumbnailImg = document.getElementById('thumbnail');
+        const tagsContainer = document.getElementById('tags-container');
+        const captionElement = document.getElementById('caption');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Highlight drop area
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropArea.classList.add('highlight');
+        }
+
+        function unhighlight() {
+            dropArea.classList.remove('highlight');
+        }
+
+        // Handle dropped files
+        dropArea.addEventListener('drop', handleDrop, false);
+        dropArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        async function handleFiles(files) {
+            if (files.length === 0) return;
+            
+            const file = files[0];
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please upload an image file (JPG, PNG, GIF)');
+                return;
+            }
+            
+            // Check file size (limit to 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Please upload an image smaller than 10MB');
+                return;
+            }
+
+            await analyzeImage(file);
+        }
+
+        async function analyzeImage(file) {
+            // Show loader and hide results
+            showLoader();
+            hideResults();
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                console.log(`Analyzing image: ${file.name}`);
+                
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Server error: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('Analysis result:', data);
+                
+                displayResults(data);
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert(`Analysis failed: ${error.message}`);
+            } finally {
+                hideLoader();
+            }
+        }
+
+        function displayResults(data) {
+            // Display thumbnail
+            if (data.thumbnail) {
+                thumbnailImg.src = `data:image/png;base64,${data.thumbnail}`;
+                thumbnailImg.style.display = 'block';
+            }
+
+            // Display tags
+            tagsContainer.innerHTML = '';
+            if (data.tags && data.tags.length > 0) {
+                data.tags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'tag';
+                    tagElement.textContent = tag;
+                    tagsContainer.appendChild(tagElement);
+                });
+            } else {
+                tagsContainer.innerHTML = '<span class="tag">No tags generated</span>';
+            }
+
+            // Display caption
+            if (data.caption) {
+                captionElement.textContent = data.caption;
+            } else {
+                captionElement.textContent = 'No description available';
+            }
+
+            showResults();
+        }
+
+        function showLoader() {
+            loader.style.display = 'block';
+            document.querySelector('.upload-section').style.display = 'none';
+        }
+
+        function hideLoader() {
+            loader.style.display = 'none';
+        }
+
+        function showResults() {
+            resultsDiv.style.display = 'block';
+        }
+
+        function hideResults() {
+            resultsDiv.style.display = 'none';
+            document.querySelector('.upload-section').style.display = 'block';
+        }
+
+        // Reset button functionality
+        resetBtn.addEventListener('click', () => {
+            hideResults();
+            fileInput.value = '';
+            thumbnailImg.src = '';
+            tagsContainer.innerHTML = '';
+            captionElement.textContent = '';
+        });
+
+        // Health check on load
+        fetch('/health')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Gateway health:', data);
+            })
+            .catch(error => {
+                console.log('Health check failed:', error);
+            });
+    </script>
+</body>
+</html> 

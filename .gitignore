@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+vendor/
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+logs/
+
+# Runtime data
+*.pid
+*.seed
+
+# Build outputs
+dist/
+build/
+*.exe
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore
+
+# AI Models (large files)
+*.bin
+*.safetensors
+models/
+
+# Uploads/temp files
+uploads/
+temp/
+tmp/
+
+# Go specific
+*.mod.sum

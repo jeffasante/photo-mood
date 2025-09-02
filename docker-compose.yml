@@ -1,0 +1,81 @@
+networks:
+  svcnet:
+    driver: bridge
+
+services:
+  # Redis message broker
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - svcnet
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Node.js Gateway - Entry point with queue integration
+  gateway:
+    build: ./gateway
+    ports:
+      - "8080:3000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - svcnet
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - MOOD_TAGGER_QUEUE=mood-analysis-queue
+      - THUMBNAIL_QUEUE=thumbnail-queue
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Python ML Service - Multiple workers possible
+  mood-tagger:
+    build: ./mood-tagger
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - svcnet
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - QUEUE_NAME=mood-analysis-queue
+    # deploy:
+    #   replicas: 2  # Run 2 instances for redundancy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Go Thumbnail Service - Multiple workers possible  
+  thumb-svc:
+    build: ./thumb-svc
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - svcnet
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - QUEUE_NAME=thumbnail-queue
+    deploy:
+      replicas: 2  # Run 2 instances for redundancy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  redis_data:
